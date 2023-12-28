@@ -4,8 +4,6 @@ import os
 import argparse
 import numpy as np
 import pandas as pd
-import tkinter
-from tkinter import ttk
 from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
