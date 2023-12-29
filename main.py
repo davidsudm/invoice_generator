@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 
 import widget_gen
-import invoice_gen
 from tkinter import messagebox
 
 
 def main():
 
-    entries = widget_gen.run_widget()
-    invoice_gen.make_invoice(entries)
-    # Close the window
+    widget_gen.run_widget()
     messagebox.showinfo("GENERADOR DE RECIBOS", "GENERACION COMPLETADA")
 
 

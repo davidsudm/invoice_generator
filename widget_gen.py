@@ -4,7 +4,6 @@ import tkinter
 from tkinter import ttk, filedialog
 from tkcalendar import Calendar
 from datetime import datetime
-
 import invoice_gen
 
 
@@ -76,7 +75,8 @@ def get_entries(property_var, year_var, month_var,
                 open_csv_file_entry_var, open_folder_entry_var,
                 check_1_var, opt_col_1_label_var,
                 check_2_var, opt_col_2_label_var,
-                check_3_var, opt_col_3_label_var):
+                check_3_var, opt_col_3_label_var,
+                window):
     """
     Retrieves values from provided variables associated with different widgets and returns them as a dictionary
 
@@ -95,6 +95,7 @@ def get_entries(property_var, year_var, month_var,
     :param opt_col_2_label_var:             The StringVar associated with the label Entry for column 2
     :param check_3_var:                     The IntVar associated with the third check button
     :param opt_col_3_label_var:             The StringVar associated with the label Entry for column 3
+    :param window:                          Main 'Tkinker' window
     :return:                                dict: A dictionary containing the retrieved values from the provided
                                             variables
     """
@@ -117,11 +118,14 @@ def get_entries(property_var, year_var, month_var,
                             "label": opt_col_3_label_var.get()}
                }
 
+    window.destroy()
+
     return entries
 
 
 def run_widget():
 
+    global window
     window = tkinter.Tk()
     window.title("Generador de Recibos")
 
@@ -263,10 +267,12 @@ def run_widget():
                                             check_2_var=check_2_var,
                                             opt_col_2_label_var=opt_col_2_label_var,
                                             check_3_var=check_3_var,
-                                            opt_col_3_label_var=opt_col_3_label_var
+                                            opt_col_3_label_var=opt_col_3_label_var,
+                                            window=window
                                         )))
     gen_invoice_button.config(width=20, height=3, fg='green', font=('Helvetica', 16))
     gen_invoice_button.grid(row=16, column=2, sticky="news", padx=20, pady=10)
 
     window.mainloop()
+
 
