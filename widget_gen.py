@@ -1,11 +1,24 @@
-import os
+#!/usr/bin/env python
+
 import tkinter
 from tkinter import ttk, filedialog
 from tkcalendar import Calendar
 from datetime import datetime
 
+import invoice_gen
+
 
 def pick_date(entry, window, date_var):
+    """
+    This function creates a date picker dialog for selecting a date using the Tkinter library in Python. The selected
+    date is then displayed in an entry widget and stored in a 'tkinter.StringVar()'.
+
+    :param entry:       The Entry widget where the selected date will be displayed
+    :param window:      The main Tkinter window
+    :param date_var:    A StringVar to store the selected date
+    :return:            None
+    """
+
     def on_date_selected(calendar):
         selected_date = calendar.get_date()
         date_var.set(selected_date)
@@ -32,11 +45,27 @@ def pick_date(entry, window, date_var):
 
 
 def browse_file(entry_var):
+    """
+    Opens a file dialog to select a file and updates the provided Entry widget's associated StringVar with the selected
+    file path.
+
+    :param entry_var:   The StringVar associated with the Entry widget where the selected file path will be displayed
+    :return:            None
+    """
+
     file_path = filedialog.askopenfilename()
     entry_var.set(file_path)
 
 
 def browse_folder(entry_var):
+    """
+    Opens a folder dialog to select a directory and updates the provided Entry widget's associated StringVar with the
+    selected folder path
+
+    :param entry_var:   The StringVar associated with the Entry widget where the selected folder path will be displayed
+    :return:            None
+    """
+
     folder_path = filedialog.askdirectory()
     entry_var.set(folder_path)
 
@@ -48,6 +77,27 @@ def get_entries(property_var, year_var, month_var,
                 check_1_var, opt_col_1_label_var,
                 check_2_var, opt_col_2_label_var,
                 check_3_var, opt_col_3_label_var):
+    """
+    Retrieves values from provided variables associated with different widgets and returns them as a dictionary
+
+    :param property_var:                    The StringVar associated with the property ComboBox
+    :param year_var:                        The StringVar associated with the year ComboBox
+    :param month_var:                       The StringVar associated with the month ComboBox
+    :param water_starting_date_var:         The StringVar associated with the water starting date Entry
+    :param water_ending_date_var:           The StringVar associated with the water ending date Entry
+    :param electricity_starting_date_var:   The StringVar associated with the electricity starting date Entry
+    :param electricity_ending_date_var:     The StringVar associated with the electricity ending date Entry
+    :param open_csv_file_entry_var:         The StringVar associated with the CSV file path Entry
+    :param open_folder_entry_var:           The StringVar associated with the folder path Entry
+    :param check_1_var:                     The IntVar associated with the first check button
+    :param opt_col_1_label_var:             The StringVar associated with the label Entry for column 1
+    :param check_2_var:                     The IntVar associated with the second check button
+    :param opt_col_2_label_var:             The StringVar associated with the label Entry for column 2
+    :param check_3_var:                     The IntVar associated with the third check button
+    :param opt_col_3_label_var:             The StringVar associated with the label Entry for column 3
+    :return:                                dict: A dictionary containing the retrieved values from the provided
+                                            variables
+    """
 
     # Retrieve values from vars
     entries = {"property": property_var.get(),
@@ -70,8 +120,7 @@ def get_entries(property_var, year_var, month_var,
     return entries
 
 
-def main():
-
+def run_widget():
 
     window = tkinter.Tk()
     window.title("Generador de Recibos")
@@ -198,30 +247,26 @@ def main():
     opt_col_3_label.grid(row=13, column=1, columnspan=2, pady=10)
 
     # Generate Invoice Button
-    gen_invoice_button = tkinter.Button(frame, text="GENERAR RECIBOS")
+    gen_invoice_button = tkinter.Button(frame, text="GENERAR RECIBOS",
+                                        command=lambda: invoice_gen.make_invoice(get_entries(
+                                            property_var=property_var,
+                                            year_var=year_var,
+                                            month_var=month_var,
+                                            water_starting_date_var=water_starting_date_var,
+                                            water_ending_date_var=water_ending_date_var,
+                                            electricity_starting_date_var=electricity_starting_date_var,
+                                            electricity_ending_date_var=electricity_ending_date_var,
+                                            open_csv_file_entry_var=open_csv_file_entry_var,
+                                            open_folder_entry_var=open_folder_entry_var,
+                                            check_1_var=check_1_var,
+                                            opt_col_1_label_var=opt_col_1_label_var,
+                                            check_2_var=check_2_var,
+                                            opt_col_2_label_var=opt_col_2_label_var,
+                                            check_3_var=check_3_var,
+                                            opt_col_3_label_var=opt_col_3_label_var
+                                        )))
     gen_invoice_button.config(width=20, height=3, fg='green', font=('Helvetica', 16))
     gen_invoice_button.grid(row=16, column=2, sticky="news", padx=20, pady=10)
 
     window.mainloop()
 
-    entries = get_entries(property_var=property_var,
-                          year_var=year_var,
-                          month_var=month_var,
-                          water_starting_date_var=water_starting_date_var,
-                          water_ending_date_var=water_ending_date_var,
-                          electricity_starting_date_var=electricity_starting_date_var,
-                          electricity_ending_date_var=electricity_ending_date_var,
-                          open_csv_file_entry_var=open_csv_file_entry_var,
-                          open_folder_entry_var=open_folder_entry_var,
-                          check_1_var=check_1_var,
-                          opt_col_1_label_var=opt_col_1_label_var,
-                          check_2_var=check_2_var,
-                          opt_col_2_label_var=opt_col_2_label_var,
-                          check_3_var=check_3_var,
-                          opt_col_3_label_var=opt_col_3_label_var)
-
-    print(entries)
-
-
-if __name__ == '__main__':
-    main()
