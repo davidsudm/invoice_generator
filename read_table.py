@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 
-import os
-import pprint
 import sys
 import numpy as np
 import pandas as pd
-from datetime import datetime
-import matplotlib.pyplot as plt
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 
 def get_remaining_columns(columns):
@@ -72,12 +67,13 @@ def get_table_dictionary(dataframe):
     for index, row in dataframe.iterrows():
         # Fixed label amounts
         # Personal data
-        entries_in_row = {'apartment': row['apartment'],
+        entries_in_row = {'apartment': int(row['apartment']),
                           'first_name': row['first_name'],
                           'last_name': row['last_name'],
-                          'rent': np.round(float(row['rent']), decimals=n_decimals),
-                          'energy': np.round(float(row['energy']), decimals=n_decimals),
-                          'water': np.round(float(row['water']), decimals=n_decimals)}
+                          'rent': "{:.{}f}".format(float(row['rent']), n_decimals),
+                          'energy': "{:.{}f}".format(float(row['energy']), n_decimals),
+                          'water': "{:.{}f}".format(float(row['water']), n_decimals)
+                          }
 
         # Variable labels and their amounts
         cnt_recoded_label = 0
@@ -94,3 +90,4 @@ def get_table_dictionary(dataframe):
         entries.append(entries_in_row)
 
     return entries
+

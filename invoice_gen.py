@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 import os
+import json
 import numpy as np
 import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+import read_table
 
 
 def create_folder(path):
@@ -24,7 +26,8 @@ def create_folder(path):
         print(f"An error occurred: {e}")
 
 
-def make_invoice(entries):
+# def make_invoice(entries):
+def make_invoice():
     """
     Creates invoices for customers using data from a CSV file and saves them as PDF files
 
@@ -32,28 +35,24 @@ def make_invoice(entries):
     :return:        None
     """
 
-    # Create ArgumentParser object
+    entries = {'property': 'COLQUEPATA',
+               'year': '2021',
+               'month': 'Abril',
+               'water': {'initial': '31/12/23', 'final': '31/12/23'},
+               'energy': {'initial': '31/12/23', 'final': '31/12/23'},
+               'csv': '/Users/davidsudm/Desktop/2024_01_RECIBOS_QUIPAYPAMPA.csv',
+               'output': '/Users/davidsudm/Desktop/2024_01_RECIBOS_QUIPAYPAMPA'
+               }
+
     building = entries['property']
     csv_file = entries['csv']
     output_dir = entries['output']
     invoice_year = entries['year']
     invoice_month = entries['month']
-    electricity_starting_date = entries['water']['initial']
-    electricity_ending_date = entries['water']['final']
-    water_starting_date = entries['electricity']['initial']
-    water_ending_date = entries['electricity']['final']
-    check_1 = bool(entries['column_1']['check'])
-    check_2 = bool(entries['column_2']['check'])
-    check_3 = bool(entries['column_3']['check'])
-
-    checks = [check_1, check_2, check_3]
-    extra_columns = []
-
-    for i, check in enumerate(checks):
-        if check is True:
-            extra_columns.append(entries[f'column_{i+1}']['label'])
-        else:
-            extra_columns.append('')
+    water_starting_date = entries['water']['initial']
+    water_ending_date = entries['water']['final']
+    energy_starting_date = entries['energy']['initial']
+    energy_ending_date = entries['energy']['final']
 
     if building == 'COLQUEPATA':
         building_address = 'Jr. Colquepata 215'
@@ -63,15 +62,35 @@ def make_invoice(entries):
     create_folder(output_dir)
     df = pd.read_csv(csv_file)
 
-    for index, row in df.iterrows():
+    with open('/Users/davidsudm/Desktop/2024_01_RECIBOS_QUIPAYPAMPA.json', 'r') as file:
+        table_dict = json.load(file)
 
-        apartment = row['DEPARTAMENTO']
-        first_name = row['NOMBRE']
-        last_name = row['APELLIDO']
-        rent_amount = np.round(float(row['MONTO_ALQUILER']), decimals=1)
-        electricity_amount = np.round(float(row['MONTO_LUZ']), decimals=1)
-        water_amount = np.round(float(row['MONTO_AGUA']), decimals=1)
-        services_amount = np.round(float(row['MONTO_SERVICIO_LIMPIEZA']), decimals=1)
+    # table_dict = read_table.get_table_dictionary(dataframe=df)
+    fixed_columns = ['apartment', 'first_name', 'last_name', 'rent', 'energy', 'water']
+
+    for i, data_dict in enumerate(table_dict):
+
+        extra_columns = [key for key in data_dict.keys() if key not in fixed_columns]
+        extra_labels = [col for col in extra_columns if "label" in col]
+        extra_amounts = [col for col in extra_columns if "amount" in col]
+
+        # If label two long, it is separated in two lines
+        for label in extra_labels:
+            value = data_dict[label]
+            data_dict[label] = '\n'.join([value[i:i + 40] for i in range(0, len(value), 40)])
+
+        total_sum = [data_dict[key] for key in extra_amounts]
+        total_sum += [data_dict['rent'], data_dict['energy'], data_dict['water']]
+        total_sum = np.nansum(total_sum)
+
+        columns = ('DESCRIPCION', ' MONTO \n[S/.]')
+        data_fixed = [(f"Renta {invoice_month} {invoice_year}", data_dict['rent']),
+                      (f"Luz del {energy_starting_date} al {energy_ending_date}", data_dict['energy']),
+                      (f"Agua del {water_starting_date} al {water_ending_date}", data_dict['water'])]
+        data_variable = [(data_dict[f'label_{k}'], data_dict[f'amount_{k}']) for k in range(len(extra_labels))]
+        data_sum = [("TOTAL", "{:.{}f}".format(total_sum, 2))]
+
+        data = data_fixed + data_variable + data_sum
 
         signature = plt.imread("figures/firma.png")
         im = OffsetImage(signature, zoom=0.50)
@@ -80,26 +99,6 @@ def make_invoice(entries):
                             boxcoords=("axes fraction", "data"),
                             box_alignment=(0.5, 0.5),
                             bboxprops=dict(alpha=0.0))
-
-        values = []
-        for i, check in enumerate(checks):
-            if check is True:
-                values.append(row[f'COLUMNA_{i+1}'])
-            else:
-                values.append(np.nan)
-
-        total_sum = [rent_amount, electricity_amount, water_amount, services_amount, values[0], values[1], values[2]]
-        total_sum = np.round(np.nansum(total_sum), decimals=1)
-
-        columns = ('DESCRIPCION', ' MONTO \n[S/.]')
-        data = ((f"Renta {invoice_month} {invoice_year}", rent_amount),
-                (f"Luz del {electricity_starting_date} al {electricity_ending_date}", electricity_amount),
-                (f"Agua del {water_starting_date} al {water_ending_date}", water_amount),
-                (f"Servicios y Limpieza de {invoice_month} {invoice_year}", services_amount),
-                (extra_columns[0], np.where(np.isnan(values[0]), "", values[0])),
-                (extra_columns[1], np.where(np.isnan(values[1]), "", values[1])),
-                (extra_columns[2], np.where(np.isnan(values[2]), "", values[2])),
-                ("TOTAL", total_sum))
 
         fig, ax = plt.subplot_mosaic([['A', 'A', 'A', 'A', 'A', 'A', 'A'],
                                       ['A', 'A', 'A', 'A', 'A', 'A', 'A'],
@@ -110,10 +109,10 @@ def make_invoice(entries):
                                       ['J', 'E', 'E', 'E', 'E', 'E', 'K'],
                                       ['J', 'E', 'E', 'E', 'E', 'E', 'K'],
                                       ['J', 'E', 'E', 'E', 'E', 'E', 'K'],
+                                      ['J', 'E', 'E', 'E', 'E', 'E', 'K'],
                                       ['G', 'G', 'G', 'H', 'H', 'H', 'H'],
                                       ['I', 'I', 'I', 'I', 'I', 'I', 'I']],
-                                     #layout="constrained",
-                                     height_ratios=[0.25, 0.25, 1, 1, 1, 1, 1, 1, 1, 1.5, 0.25],
+                                     height_ratios=[0.25, 0.25, 1, 1, 1, 1, 1, 1, 1, 1, 1.5, 0.25],
                                      width_ratios=[0.5, 0.65, 0.65, 1.25, 1.25, 1.25, 0.5],
                                      figsize=(10, 16))
 
@@ -164,11 +163,11 @@ def make_invoice(entries):
         ax['B'].text(0.05, 0.40, 'Lima, Perú', va='center', color='gray', fontsize=14, weight='bold')
 
         ax['C'].text(0.02, 0.90, 'Arrendatario :', va='center', color='C0', fontsize=18, weight='bold')
-        ax['C'].text(0.02, 0.80, last_name, va='center', color='gray', fontsize=18, weight='bold')
-        ax['C'].text(0.02, 0.70, first_name, va='center', color='gray', fontsize=18, weight='bold')
+        ax['C'].text(0.02, 0.80, data_dict["last_name"], va='center', color='gray', fontsize=18, weight='bold')
+        ax['C'].text(0.02, 0.70, data_dict["first_name"], va='center', color='gray', fontsize=18, weight='bold')
         ax['C'].text(0.02, 0.60, '', va='center', color='gray', fontsize=18)
         ax['C'].text(0.02, 0.50, 'Departamento :', va='center', color='C0', fontsize=18, weight='bold')
-        ax['C'].text(0.02, 0.40, apartment, va='center', color='gray', fontsize=18, weight='bold')
+        ax['C'].text(0.02, 0.40, data_dict["apartment"], va='center', color='gray', fontsize=18, weight='bold')
         ax['C'].text(0.02, 0.30, '', va='center', color='gray', fontsize=18, weight='bold')
         ax['C'].text(0.02, 0.20, 'Fecha de emisión :', va='center', color='C0', fontsize=18, weight='bold')
         ax['C'].text(0.02, 0.10, datetime.today().date().strftime("%d/%m/%Y"), va='center', color='gray', fontsize=18, weight='bold')
@@ -178,7 +177,17 @@ def make_invoice(entries):
         ax['H'].add_artist(ab)
         ax['H'].text(0.550, 0.22, 'Wuilber Miranda', va='center', color='gray', fontsize=15, weight='bold')
         ax['H'].text(0.565, 0.12, 'Quispecahuana', va='center', color='gray', fontsize=15, weight='bold')
-        ax['H'].text(0.500, 0.00, 'Propietario Administrador', va='center', color='gray', fontsize=12, weight='bold')
+        ax['H'].text(0.500, 0.00, 'Propietario y Administrador', va='center', color='gray', fontsize=12, weight='bold')
 
-        plt.savefig(os.path.join(output_dir, f"{invoice_year}_{invoice_month}_depa_{apartment}.pdf"), format="pdf")
+        output_filename = f"{invoice_year}_{invoice_month}_depa_{data_dict['apartment']}_{data_dict['last_name'].replace(' ', '_')}.pdf"
+        plt.savefig(os.path.join(output_dir, output_filename), format="pdf")
         plt.close(fig)
+
+
+def main():
+
+    make_invoice()
+
+
+if __name__ == '__main__':
+    main()
