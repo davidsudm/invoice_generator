@@ -69,35 +69,25 @@ def browse_folder(entry_var):
     entry_var.set(folder_path)
 
 
-def get_entries(property_var, year_var, month_var,
-                water_starting_date_var, water_ending_date_var,
-                electricity_starting_date_var, electricity_ending_date_var,
-                open_csv_file_entry_var, open_folder_entry_var,
-                check_1_var, opt_col_1_label_var,
-                check_2_var, opt_col_2_label_var,
-                check_3_var, opt_col_3_label_var,
-                window):
+def get_widget_entries(property_var, year_var, month_var,
+                       water_starting_date_var, water_ending_date_var,
+                       energy_starting_date_var, energy_ending_date_var,
+                       open_csv_file_entry_var, open_folder_entry_var, window):
     """
     Retrieves values from provided variables associated with different widgets and returns them as a dictionary
 
-    :param property_var:                    The StringVar associated with the property ComboBox
-    :param year_var:                        The StringVar associated with the year ComboBox
-    :param month_var:                       The StringVar associated with the month ComboBox
-    :param water_starting_date_var:         The StringVar associated with the water starting date Entry
-    :param water_ending_date_var:           The StringVar associated with the water ending date Entry
-    :param electricity_starting_date_var:   The StringVar associated with the electricity starting date Entry
-    :param electricity_ending_date_var:     The StringVar associated with the electricity ending date Entry
-    :param open_csv_file_entry_var:         The StringVar associated with the CSV file path Entry
-    :param open_folder_entry_var:           The StringVar associated with the folder path Entry
-    :param check_1_var:                     The IntVar associated with the first check button
-    :param opt_col_1_label_var:             The StringVar associated with the label Entry for column 1
-    :param check_2_var:                     The IntVar associated with the second check button
-    :param opt_col_2_label_var:             The StringVar associated with the label Entry for column 2
-    :param check_3_var:                     The IntVar associated with the third check button
-    :param opt_col_3_label_var:             The StringVar associated with the label Entry for column 3
-    :param window:                          Main 'Tkinker' window
-    :return:                                dict: A dictionary containing the retrieved values from the provided
-                                            variables
+    :param property_var:               The StringVar associated with the property ComboBox
+    :param year_var:                   The StringVar associated with the year ComboBox
+    :param month_var:                  The StringVar associated with the month ComboBox
+    :param water_starting_date_var:    The StringVar associated with the water starting date Entry
+    :param water_ending_date_var:      The StringVar associated with the water ending date Entry
+    :param energy_starting_date_var:   The StringVar associated with the energy starting date Entry
+    :param energy_ending_date_var:     The StringVar associated with the energy ending date Entry
+    :param open_csv_file_entry_var:    The StringVar associated with the CSV file path Entry
+    :param open_folder_entry_var:      The StringVar associated with the folder path Entry
+    :param window:                     Main 'Tkinker' window
+    :return:                           dict: A dictionary containing the retrieved values from the provided
+                                       variables
     """
 
     # Retrieve values from vars
@@ -106,16 +96,10 @@ def get_entries(property_var, year_var, month_var,
                "month": month_var.get(),
                "water": {"initial": water_starting_date_var.get(),
                          "final": water_ending_date_var.get()},
-               "electricity": {"initial": electricity_starting_date_var.get(),
-                               "final": electricity_ending_date_var.get()},
+               "energy": {"initial": energy_starting_date_var.get(),
+                          "final": energy_ending_date_var.get()},
                "csv": open_csv_file_entry_var.get(),
-               "output": open_folder_entry_var.get(),
-               "column_1": {"check": check_1_var.get(),
-                            "label": opt_col_1_label_var.get()},
-               "column_2": {"check": check_2_var.get(),
-                            "label": opt_col_2_label_var.get()},
-               "column_3": {"check": check_3_var.get(),
-                            "label": opt_col_3_label_var.get()}
+               "output": open_folder_entry_var.get()
                }
 
     window.destroy()
@@ -182,27 +166,27 @@ def run_widget():
                                                                         window=window))
     pick_date_button_water_o.grid(row=4, column=1, pady=2)
 
-    # Calendar : electricity
-    electricity_label = tkinter.Label(frame, text="SERVICIO DE LUZ")
-    electricity_label.grid(row=5, column=0, pady=20)
+    # Calendar : energy
+    energy_label = tkinter.Label(frame, text="SERVICIO DE LUZ")
+    energy_label.grid(row=5, column=0, pady=20)
 
-    electricity_starting_date_var = tkinter.StringVar()
-    electricity_starting_date = tkinter.Entry(frame)
-    electricity_starting_date.grid(row=5, column=2, pady=20)
-    pick_date_button_electricity_o = tkinter.Button(frame, text="FECHA DE INICIO",
-                                                    command=lambda: pick_date(entry=electricity_starting_date,
-                                                                              date_var=electricity_starting_date_var,
+    energy_starting_date_var = tkinter.StringVar()
+    energy_starting_date = tkinter.Entry(frame)
+    energy_starting_date.grid(row=5, column=2, pady=20)
+    pick_date_button_energy_o = tkinter.Button(frame, text="FECHA DE INICIO",
+                                                    command=lambda: pick_date(entry=energy_starting_date,
+                                                                              date_var=energy_starting_date_var,
                                                                               window=window))
-    pick_date_button_electricity_o.grid(row=5, column=1, pady=20)
+    pick_date_button_energy_o.grid(row=5, column=1, pady=20)
 
-    electricity_ending_date_var = tkinter.StringVar()
-    electricity_ending_date = tkinter.Entry(frame)
-    electricity_ending_date.grid(row=6, column=2, pady=2)
-    pick_date_button_electricity_o = tkinter.Button(frame, text="FECHA DE FIN",
-                                                    command=lambda: pick_date(entry=electricity_ending_date,
-                                                                              date_var=electricity_ending_date_var,
+    energy_ending_date_var = tkinter.StringVar()
+    energy_ending_date = tkinter.Entry(frame)
+    energy_ending_date.grid(row=6, column=2, pady=2)
+    pick_date_button_energy_o = tkinter.Button(frame, text="FECHA DE FIN",
+                                                    command=lambda: pick_date(entry=energy_ending_date,
+                                                                              date_var=energy_ending_date_var,
                                                                               window=window))
-    pick_date_button_electricity_o.grid(row=6, column=1, pady=2)
+    pick_date_button_energy_o.grid(row=6, column=1, pady=2)
 
     # CSV file
     open_csv_file_entry_var = tkinter.StringVar()
@@ -222,57 +206,21 @@ def run_widget():
     open_folder_button.grid(row=8, column=0, sticky="news", padx=20, pady=20)
     open_folder_entry.grid(row=8, column=1, columnspan=2, padx=10, pady=20)
 
-    # Optional Columns :
-    optional_columns = tkinter.Label(frame, text="COLUMNAS ADICIONALES (OPCIONAL)")
-    optional_columns.grid(row=9, column=0, columnspan=3, pady=20)
-    opt_col_check = tkinter.Label(frame, text="ETIQUETA DE LA COLUMNA")
-    opt_col_check.grid(row=10, column=1, columnspan=2, pady=10)
-
-    # Checkbutton :
-    check_1_var = tkinter.IntVar()
-    opt_col_1_label_var = tkinter.StringVar()
-    opt_col_1 = tkinter.Checkbutton(frame, text="AGREGAR COLUMNA 1", variable=check_1_var)
-    opt_col_1_label = tkinter.Entry(frame, width=50, textvariable=opt_col_1_label_var)
-    opt_col_1.grid(row=11, column=0, pady=10)
-    opt_col_1_label.grid(row=11, column=1, columnspan=2, pady=10)
-
-    check_2_var = tkinter.IntVar()
-    opt_col_2_label_var = tkinter.StringVar()
-    opt_col_2 = tkinter.Checkbutton(frame, text="AGREGAR COLUMNA 2", variable=check_2_var)
-    opt_col_2_label = tkinter.Entry(frame, width=50, textvariable=opt_col_2_label_var)
-    opt_col_2.grid(row=12, column=0, pady=10)
-    opt_col_2_label.grid(row=12, column=1, columnspan=2, pady=10)
-
-    check_3_var = tkinter.IntVar()
-    opt_col_3_label_var = tkinter.StringVar()
-    opt_col_3 = tkinter.Checkbutton(frame, text="AGREGAR COLUMNA 3", variable=check_3_var)
-    opt_col_3_label = tkinter.Entry(frame, width=50, textvariable=opt_col_3_label_var)
-    opt_col_3.grid(row=13, column=0, pady=10)
-    opt_col_3_label.grid(row=13, column=1, columnspan=2, pady=10)
-
     # Generate Invoice Button
     gen_invoice_button = tkinter.Button(frame, text="GENERAR RECIBOS",
-                                        command=lambda: invoice_gen.make_invoice(get_entries(
+                                        command=lambda: invoice_gen.make_invoice(get_widget_entries(
                                             property_var=property_var,
                                             year_var=year_var,
                                             month_var=month_var,
                                             water_starting_date_var=water_starting_date_var,
                                             water_ending_date_var=water_ending_date_var,
-                                            electricity_starting_date_var=electricity_starting_date_var,
-                                            electricity_ending_date_var=electricity_ending_date_var,
+                                            energy_starting_date_var=energy_starting_date_var,
+                                            energy_ending_date_var=energy_ending_date_var,
                                             open_csv_file_entry_var=open_csv_file_entry_var,
                                             open_folder_entry_var=open_folder_entry_var,
-                                            check_1_var=check_1_var,
-                                            opt_col_1_label_var=opt_col_1_label_var,
-                                            check_2_var=check_2_var,
-                                            opt_col_2_label_var=opt_col_2_label_var,
-                                            check_3_var=check_3_var,
-                                            opt_col_3_label_var=opt_col_3_label_var,
-                                            window=window
-                                        )))
+                                            window=window))
+                                        )
     gen_invoice_button.config(width=20, height=3, fg='green', font=('Helvetica', 16))
     gen_invoice_button.grid(row=16, column=2, sticky="news", padx=20, pady=10)
 
     window.mainloop()
-
-
