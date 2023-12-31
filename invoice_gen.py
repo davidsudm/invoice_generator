@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
 import os
-import json
+import read_table
 import numpy as np
 import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-import read_table
 
 
 def create_folder(path):
@@ -26,23 +25,31 @@ def create_folder(path):
         print(f"An error occurred: {e}")
 
 
-# def make_invoice(entries):
-def make_invoice():
-    """
-    Creates invoices for customers using data from a CSV file and saves them as PDF files
+def break_string_at_word(text, max_length):
+    lines = []
+    current_line = ""
 
-    :param entries: (dict) A dictionary containing values for different invoice parameters.
-    :return:        None
+    words = text.split()
+
+    for word in words:
+        if len(current_line) + len(word) + 1 <= max_length:
+            current_line += word + " "
+        else:
+            lines.append(current_line.strip())
+            current_line = word + " "
+
+    # Add the last line
+    lines.append(current_line.strip())
+
+    return "\n".join(lines)
+
+
+def make_invoice(entries):
     """
 
-    entries = {'property': 'COLQUEPATA',
-               'year': '2021',
-               'month': 'Abril',
-               'water': {'initial': '31/12/23', 'final': '31/12/23'},
-               'energy': {'initial': '31/12/23', 'final': '31/12/23'},
-               'csv': '/Users/davidsudm/Desktop/2024_01_RECIBOS_QUIPAYPAMPA.csv',
-               'output': '/Users/davidsudm/Desktop/2024_01_RECIBOS_QUIPAYPAMPA'
-               }
+    :param entries: 
+    :return: 
+    """
 
     building = entries['property']
     csv_file = entries['csv']
@@ -61,10 +68,7 @@ def make_invoice():
 
     create_folder(output_dir)
     df = pd.read_csv(csv_file)
-
-    with open('/Users/davidsudm/Desktop/2024_01_RECIBOS_QUIPAYPAMPA.json', 'r') as file:
-        table_dict = json.load(file)
-
+    table_dict = read_table.get_table_dictionary(dataframe=df)
     # table_dict = read_table.get_table_dictionary(dataframe=df)
     fixed_columns = ['apartment', 'first_name', 'last_name', 'rent', 'energy', 'water']
 
@@ -76,17 +80,17 @@ def make_invoice():
 
         # If label two long, it is separated in two lines
         for label in extra_labels:
-            value = data_dict[label]
-            data_dict[label] = '\n'.join([value[i:i + 40] for i in range(0, len(value), 40)])
+            data_dict[label] = break_string_at_word(text=data_dict[label], max_length=40)
 
         total_sum = [data_dict[key] for key in extra_amounts]
-        total_sum += [data_dict['rent'], data_dict['energy'], data_dict['water']]
+        total_sum += [float(data_dict['rent']), float(data_dict['energy']), float(data_dict['water'])]
         total_sum = np.nansum(total_sum)
 
-        columns = ('DESCRIPCION', ' MONTO \n[S/.]')
+        columns = ('Descripción', ' Monto \n[S/.]')
         data_fixed = [(f"Renta {invoice_month} {invoice_year}", data_dict['rent']),
-                      (f"Luz del {energy_starting_date} al {energy_ending_date}", data_dict['energy']),
-                      (f"Agua del {water_starting_date} al {water_ending_date}", data_dict['water'])]
+                      (f"Agua del {water_starting_date} al {water_ending_date}", data_dict['water']),
+                      (f"Luz del {energy_starting_date} al {energy_ending_date}", data_dict['energy'])
+                      ]
         data_variable = [(data_dict[f'label_{k}'], data_dict[f'amount_{k}']) for k in range(len(extra_labels))]
         data_sum = [("TOTAL", "{:.{}f}".format(total_sum, 2))]
 
@@ -114,7 +118,7 @@ def make_invoice():
                                       ['I', 'I', 'I', 'I', 'I', 'I', 'I']],
                                      height_ratios=[0.25, 0.25, 1, 1, 1, 1, 1, 1, 1, 1, 1.5, 0.25],
                                      width_ratios=[0.5, 0.65, 0.65, 1.25, 1.25, 1.25, 0.5],
-                                     figsize=(10, 16))
+                                     figsize=(10, 18))
 
         # Add a table at the bottom of the axes
         the_table = ax['E'].table(cellText=data,
@@ -157,37 +161,28 @@ def make_invoice():
 
         ax['B'].text(0.05, 0.90, 'Lugar de', va='center', color='C0', fontsize=14, weight='bold')
         ax['B'].text(0.05, 0.80, 'arrendamiento :', va='center', color='C0', fontsize=14, weight='bold')
-        ax['B'].text(0.05, 0.70, building_address, va='center', color='gray', fontsize=14, weight='bold')
-        ax['B'].text(0.05, 0.60, 'Urb. Tahuantinsuyo', va='center', color='gray', fontsize=14, weight='bold')
-        ax['B'].text(0.05, 0.50, 'Independencia', va='center', color='gray', fontsize=14, weight='bold')
-        ax['B'].text(0.05, 0.40, 'Lima, Perú', va='center', color='gray', fontsize=14, weight='bold')
+        ax['B'].text(0.05, 0.68, building_address, va='center', color='gray', fontsize=14, weight='bold')
+        ax['B'].text(0.05, 0.58, 'Urb. Tahuantinsuyo', va='center', color='gray', fontsize=14, weight='bold')
+        ax['B'].text(0.05, 0.48, 'Independencia', va='center', color='gray', fontsize=14, weight='bold')
+        ax['B'].text(0.05, 0.38, 'Lima, Perú', va='center', color='gray', fontsize=14, weight='bold')
 
         ax['C'].text(0.02, 0.90, 'Arrendatario :', va='center', color='C0', fontsize=18, weight='bold')
-        ax['C'].text(0.02, 0.80, data_dict["last_name"], va='center', color='gray', fontsize=18, weight='bold')
-        ax['C'].text(0.02, 0.70, data_dict["first_name"], va='center', color='gray', fontsize=18, weight='bold')
-        ax['C'].text(0.02, 0.60, '', va='center', color='gray', fontsize=18)
+        ax['C'].text(0.02, 0.78, data_dict["last_name"], va='center', color='gray', fontsize=18, weight='bold')
+        ax['C'].text(0.02, 0.68, data_dict["first_name"], va='center', color='gray', fontsize=18, weight='bold')
+        ax['C'].text(0.02, 0.58, '', va='center', color='gray', fontsize=18)
         ax['C'].text(0.02, 0.50, 'Departamento :', va='center', color='C0', fontsize=18, weight='bold')
-        ax['C'].text(0.02, 0.40, data_dict["apartment"], va='center', color='gray', fontsize=18, weight='bold')
+        ax['C'].text(0.02, 0.38, data_dict["apartment"], va='center', color='gray', fontsize=18, weight='bold')
         ax['C'].text(0.02, 0.30, '', va='center', color='gray', fontsize=18, weight='bold')
         ax['C'].text(0.02, 0.20, 'Fecha de emisión :', va='center', color='C0', fontsize=18, weight='bold')
-        ax['C'].text(0.02, 0.10, datetime.today().date().strftime("%d/%m/%Y"), va='center', color='gray', fontsize=18, weight='bold')
+        ax['C'].text(0.02, 0.08, datetime.today().date().strftime("%d/%m/%Y"), va='center', color='gray', fontsize=18, weight='bold')
 
         ax['G'].text(0.02, 0.85, 'Atentamente,', va='center', color='gray', fontsize=18, weight='bold')
 
         ax['H'].add_artist(ab)
-        ax['H'].text(0.550, 0.22, 'Wuilber Miranda', va='center', color='gray', fontsize=15, weight='bold')
-        ax['H'].text(0.565, 0.12, 'Quispecahuana', va='center', color='gray', fontsize=15, weight='bold')
-        ax['H'].text(0.500, 0.00, 'Propietario y Administrador', va='center', color='gray', fontsize=12, weight='bold')
+        ax['H'].text(0.72, 0.22, 'Wuilber Miranda\nQuispecahuana', va='center', ha='center', color='gray', fontsize=15, weight='bold')
+        ax['H'].text(0.72, 0.00, 'Propietario y Administrador', va='center', ha='center', color='gray', fontsize=12, weight='bold')
 
-        output_filename = f"{invoice_year}_{invoice_month}_depa_{data_dict['apartment']}_{data_dict['last_name'].replace(' ', '_')}.pdf"
+        output_filename = f"{invoice_year}_{invoice_month.lower()}_depa_{data_dict['apartment']}_{data_dict['last_name'].replace(' ', '_').lower()}.pdf"
         plt.savefig(os.path.join(output_dir, output_filename), format="pdf")
         plt.close(fig)
 
-
-def main():
-
-    make_invoice()
-
-
-if __name__ == '__main__':
-    main()
