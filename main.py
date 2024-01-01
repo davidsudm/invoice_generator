@@ -2,6 +2,8 @@
 
 import widget_gen
 from tkinter import messagebox
+import babel.numbers
+import matplotlib.backends.backend_pdf
 
 
 def main():

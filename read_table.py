@@ -77,15 +77,15 @@ def get_table_dictionary(dataframe):
 
         # Variable labels and their amounts
         cnt_recoded_label = 0
-        for i, (_, _) in enumerate(paired_list):
-            label_key = f'label_{cnt_recoded_label}'
-            amount_key = f'amount_{cnt_recoded_label}'
+        for (label_key, amount_key) in (paired_list):
 
             if row[label_key] is not None and row[label_key] != '' and not pd.isna(row[amount_key]):
                 if row[amount_key] != 0.0:
-                    entries_in_row[label_key] = row[label_key]
-                    entries_in_row[amount_key] = np.round(float(row[amount_key]), decimals=n_decimals)
+                    entries_in_row[f'label_{cnt_recoded_label}'] = row[label_key]
+                    entries_in_row[f'amount_{cnt_recoded_label}'] = np.round(float(row[amount_key]), decimals=n_decimals)
                     cnt_recoded_label += 1
+            else:
+                continue
 
         entries.append(entries_in_row)
 
