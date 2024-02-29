@@ -73,7 +73,20 @@ def make_invoice(entries):
         building_address = 'Jr. Quipaypampa 227'
 
     create_folder(output_dir)
-    df = pd.read_csv(csv_file)
+    df = pd.DataFrame()
+
+    try:
+        # Try reading the file with ';' as the delimiter
+        try:
+            df = pd.read_csv(csv_file, delimiter=';', decimal=',')
+        except pd.errors.ParserError:
+            # If reading with ';' fails, try reading with ',' as the delimiter
+            df = pd.read_csv(csv_file)
+    except FileNotFoundError:
+        print(f"File '{csv_file}' not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
     table_dict = read_table.get_table_dictionary(dataframe=df)
     fixed_columns = ['apartment', 'first_name', 'last_name', 'rent', 'energy', 'water']
 
