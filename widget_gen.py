@@ -72,7 +72,7 @@ def browse_folder(entry_var):
 def get_widget_entries(property_var, year_var, month_var,
                        water_starting_date_var, water_ending_date_var,
                        energy_starting_date_var, energy_ending_date_var,
-                       open_csv_file_entry_var, open_folder_entry_var, window):
+                       open_excel_file_entry_var, open_folder_entry_var, window):
     """
     Retrieves values from provided variables associated with different widgets and returns them as a dictionary
 
@@ -83,7 +83,7 @@ def get_widget_entries(property_var, year_var, month_var,
     :param water_ending_date_var:      The StringVar associated with the water ending date Entry
     :param energy_starting_date_var:   The StringVar associated with the energy starting date Entry
     :param energy_ending_date_var:     The StringVar associated with the energy ending date Entry
-    :param open_csv_file_entry_var:    The StringVar associated with the CSV file path Entry
+    :param open_excel_file_entry_var:    The StringVar associated with the Excel file path Entry
     :param open_folder_entry_var:      The StringVar associated with the folder path Entry
     :param window:                     Main 'Tkinker' window
     :return:                           dict: A dictionary containing the retrieved values from the provided
@@ -98,7 +98,7 @@ def get_widget_entries(property_var, year_var, month_var,
                          "final": water_ending_date_var.get()},
                "energy": {"initial": energy_starting_date_var.get(),
                           "final": energy_ending_date_var.get()},
-               "csv": open_csv_file_entry_var.get(),
+               "excel": open_excel_file_entry_var.get(),
                "output": open_folder_entry_var.get()
                }
 
@@ -188,20 +188,20 @@ def run_widget():
                                                                               window=window))
     pick_date_button_energy_o.grid(row=6, column=1, pady=2)
 
-    # CSV file
-    open_csv_file_entry_var = tkinter.StringVar()
-    open_csv_file_entry = tkinter.Entry(frame, textvariable=open_csv_file_entry_var, width=50)
-    open_csv_file_button = tkinter.Button(frame,
-                                          text="BUSCAR TABLERO CSV",
-                                          command=lambda: browse_file(open_csv_file_entry_var))
-    open_csv_file_button.grid(row=7, column=0, sticky="news", padx=20, pady=20)
-    open_csv_file_entry.grid(row=7, column=1, columnspan=2, padx=10, pady=20)
+    # excel file
+    open_excel_file_entry_var = tkinter.StringVar()
+    open_excel_file_entry = tkinter.Entry(frame, textvariable=open_excel_file_entry_var, width=50)
+    open_excel_file_button = tkinter.Button(frame,
+                                          text="BUSCAR ARCHIVO EXCEL",
+                                          command=lambda: browse_file(open_excel_file_entry_var))
+    open_excel_file_button.grid(row=7, column=0, sticky="news", padx=20, pady=20)
+    open_excel_file_entry.grid(row=7, column=1, columnspan=2, padx=10, pady=20)
 
     # Saving directory :
     open_folder_entry_var = tkinter.StringVar()
     open_folder_entry = tkinter.Entry(frame, textvariable=open_folder_entry_var, width=50)
     open_folder_button = tkinter.Button(frame,
-                                        text="GUARDAR EN CARPETA",
+                                        text="GUARDAR RECIBOS EN CARPETA",
                                         command=lambda: browse_folder(open_folder_entry_var))
     open_folder_button.grid(row=8, column=0, sticky="news", padx=20, pady=20)
     open_folder_entry.grid(row=8, column=1, columnspan=2, padx=10, pady=20)
@@ -216,7 +216,7 @@ def run_widget():
                                             water_ending_date_var=water_ending_date_var,
                                             energy_starting_date_var=energy_starting_date_var,
                                             energy_ending_date_var=energy_ending_date_var,
-                                            open_csv_file_entry_var=open_csv_file_entry_var,
+                                            open_excel_file_entry_var=open_excel_file_entry_var,
                                             open_folder_entry_var=open_folder_entry_var,
                                             window=window))
                                         )

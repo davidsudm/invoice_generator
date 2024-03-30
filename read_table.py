@@ -46,7 +46,7 @@ def get_table_dictionary(dataframe):
 
     remaining_columns = get_remaining_columns(dataframe.columns)
 
-    # check remaining_columns are in a even number:
+    # check remaining_columns are in an even number:
     if len(remaining_columns) % 2 != 0:
         print("Error: Número de columnas addicionales no es par.")
         sys.exit(1)
@@ -67,7 +67,7 @@ def get_table_dictionary(dataframe):
     for index, row in dataframe.iterrows():
         # Fixed label amounts
         # Personal data
-        entries_in_row = {'apartment': int(row['apartment']),
+        entries_in_row = {'apartment': str(row['apartment']),
                           'first_name': row['first_name'],
                           'last_name': row['last_name'],
                           'rent': "{:.{}f}".format(float(row['rent']), n_decimals),
@@ -77,7 +77,7 @@ def get_table_dictionary(dataframe):
 
         # Variable labels and their amounts
         cnt_recoded_label = 0
-        for (label_key, amount_key) in (paired_list):
+        for (label_key, amount_key) in paired_list:
 
             if row[label_key] is not None and row[label_key] != '' and not pd.isna(row[amount_key]):
                 if row[amount_key] != 0.0:

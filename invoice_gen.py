@@ -58,7 +58,7 @@ def make_invoice(entries):
     print("Current Working Directory:", os.getcwd())
 
     building = entries['property']
-    csv_file = entries['csv']
+    excel_file = entries['excel']
     output_dir = entries['output']
     invoice_year = entries['year']
     invoice_month = entries['month']
@@ -77,13 +77,9 @@ def make_invoice(entries):
 
     try:
         # Try reading the file with ';' as the delimiter
-        try:
-            df = pd.read_csv(csv_file, delimiter=';', decimal=',')
-        except pd.errors.ParserError:
-            # If reading with ';' fails, try reading with ',' as the delimiter
-            df = pd.read_csv(csv_file)
+        df = pd.read_excel(io=excel_file, usecols="A:P", engine="openpyxl", sheet_name="CSV")
     except FileNotFoundError:
-        print(f"File '{csv_file}' not found.")
+        print(f"File '{excel_file}' not found.")
     except Exception as e:
         print(f"An error occurred: {e}")
 
