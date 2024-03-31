@@ -27,7 +27,9 @@ def get_table_dictionary(dataframe):
     :return:
     """
 
-    dataframe.columns = dataframe.columns.str.lower()
+    my_columns = dataframe.columns.tolist()
+    my_columns = [element.lower() for element in my_columns]
+    dataframe.columns = my_columns
 
     for col in dataframe.columns:
 

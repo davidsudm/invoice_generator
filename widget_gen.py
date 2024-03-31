@@ -140,7 +140,7 @@ def run_widget():
     month_label = tkinter.Label(frame, text="MES")
     month_label.grid(row=0, column=2, pady=10)
     month_values = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+                    "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"]
     month_cb = ttk.Combobox(frame, values=month_values, state='readonly', textvariable=month_var)
     month_cb.grid(row=1, column=2, padx=10)
 

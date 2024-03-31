@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+
 import read_table
 import numpy as np
 import pandas as pd
@@ -76,8 +77,7 @@ def make_invoice(entries):
     df = pd.DataFrame()
 
     try:
-        # Try reading the file with ';' as the delimiter
-        df = pd.read_excel(io=excel_file, usecols="A:P", engine="openpyxl", sheet_name="CSV")
+        df = pd.read_excel(io=excel_file, usecols="A:P", sheet_name="CSV", engine='openpyxl')
     except FileNotFoundError:
         print(f"File '{excel_file}' not found.")
     except Exception as e:
@@ -199,4 +199,3 @@ def make_invoice(entries):
         output_filename = f"{invoice_year}_{invoice_month.lower()}_depa_{client_dict['apartment']}_{client_dict['last_name'].replace(' ', '_').lower()}.pdf"
         plt.savefig(os.path.join(output_dir, output_filename), format="pdf")
         plt.close(fig)
-

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import widget_gen
 from tkinter import messagebox
 import babel.numbers
